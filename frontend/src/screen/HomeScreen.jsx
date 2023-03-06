@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styled from "styled-components";
 import { AnimatePresence, color, motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import Note from '../components/Note';
-import { Reorder } from "framer-motion"
 function hexToRgba(hex, opacity) {
     const hexWithoutHash = hex.replace('#', '');
     const r = parseInt(hexWithoutHash.substring(0, 2), 16);
@@ -154,10 +153,11 @@ const dotAnim = {
           </div>
           <StyledRight>
             <StyledSearchBar>
-                <input type="text"  placeholder='Search for a note'/>
                 <div className='icon'>
-                    asdasda
+                    <FontAwesomeIcon icon={faMagnifyingGlass}/>
                 </div>
+                <input type="text"  placeholder='Search for a note'/>
+                
             </StyledSearchBar>
             <div className="data">
                 {/* <Reorder.Group axis="x" values={notes} onReorder={setNotes}> */}
@@ -252,6 +252,7 @@ const StyledSearchBar = styled(motion.div)`
     }
     .icon{
         color: #fff;
+        padding-right: 1rem;
     }
 `
 
