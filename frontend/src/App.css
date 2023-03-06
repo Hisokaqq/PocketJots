@@ -7,3 +7,13 @@
 body {
   background: #1D1D1F
 }
+
+p {
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  all: unset;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+}
