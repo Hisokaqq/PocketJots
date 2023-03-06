@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import Note from '../components/Note';
 
 function hexToRgba(hex, opacity) {
     const hexWithoutHash = hex.replace('#', '');
@@ -63,9 +64,11 @@ const dotAnim = {
   
   const HomeScreen = () => {
     const [isRotated, setIsRotated] = useState(false);
-    const [notes, setNotes] = useState([1,2,3,4,5,6,7,8,9,10])
+    const [notes, setNotes] = useState([1,2])
     const handlePlusClick = () => {
       setIsRotated((prevState) => !prevState);
+      setNotes(prevNotes => [0, ...prevNotes])
+    
     };
     
   
@@ -132,10 +135,13 @@ const dotAnim = {
             <div className="data">
                 {
                     notes.map((note, index)=>(
-                        <StyledNote style={{background: hexToRgba("#FFCF7D", 9)}}>
-                            <textarea spellCheck={false} placeholder='Make some notes'></textarea>
-                            <p className='date'>date</p>
-                        </StyledNote>
+                        <Note 
+                        note={note} 
+                        notes={notes} 
+                        id={index}
+                        key={index}
+                        />
+                        // <p>{note}</p>
                     ))
                 }
             </div>
