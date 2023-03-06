@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 
 const Cursor = () => {
-    const cursorsize = 500
+    const cursorsize = 200
     const cursorsize2 = 30
 
     const [m_p, setM_p] = useState({
@@ -17,8 +17,8 @@ const Cursor = () => {
             y: m_p.y - (cursorsize/2),
             height: cursorsize,
             width: cursorsize,
-            // rotateX: [0, 360, 0],
-            // rotateY: [0, 180, 0],
+            rotateX: [0, 360, 0],
+            rotateY: [0, 180, 0],
             rotate: [0, 360, 0],
             scale: [1, 1.15, 1],
             // filter: "blur(2000px)",
@@ -32,10 +32,10 @@ const Cursor = () => {
                 type: 'spring', stiffness: 100, damping: 40 
                 },
                 rotateX:{
-                    repeat: Infinity, duration: 50
+                    repeat: Infinity, duration: 100
                 },
                 rotateY:{
-                    repeat: Infinity, duration: 50
+                    repeat: Infinity, duration: 100
                 },
                 rotate:{
                     repeat: Infinity, duration: 10
@@ -91,7 +91,7 @@ const StyledCursor = styled(motion.div)`
 const StyledCursor2 = styled(motion.div)`
     position: fixed;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 300;
     &:before,
     &:after {
         content: "";

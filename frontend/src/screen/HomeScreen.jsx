@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from "styled-components";
-import { motion} from "framer-motion";
+import { AnimatePresence, color, motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import Note from '../components/Note';
-
+import { Reorder } from "framer-motion"
 function hexToRgba(hex, opacity) {
     const hexWithoutHash = hex.replace('#', '');
     const r = parseInt(hexWithoutHash.substring(0, 2), 16);
@@ -64,12 +64,32 @@ const dotAnim = {
   
   const HomeScreen = () => {
     const [isRotated, setIsRotated] = useState(false);
-    const [notes, setNotes] = useState([1,2])
+    const [notes, setNotes] = useState([{color: "FFCF7D"}])
+    const [isFirstNoteAdded, setIsFirstNoteAdded] = useState(false);
+    const [prev, setPrev] = useState([])
+    const [disabled, setDisabled] = useState(false);
     const handlePlusClick = () => {
-      setIsRotated((prevState) => !prevState);
-      setNotes(prevNotes => [0, ...prevNotes])
-    
+        setDisabled(true)
+        setIsRotated((prevState) => !prevState);
+        
     };
+    const [color, setColor] = useState(null)
+    
+    const HandleAddNote = (color) =>{
+        setColor(color)
+        setPrev(notes);
+        setNotes([]);
+        
+    }
+      
+      useEffect(() => {
+        if (prev.length > 0 && notes.length === 0) {
+          setNotes([{color: color}, ...prev]);
+        }
+      }, [notes, prev]);
+      
+      
+      
     
   
     return (
@@ -79,9 +99,11 @@ const dotAnim = {
             <p className="logo">PocetJots</p>
             <div className="notes-container">
               <StyledPlus
+                disabled={disabled}
                 animate={isRotated ? "rotateClockwise" : "rotateCounterClockwise"}
                 variants={plusAnim}
                 onClick={handlePlusClick}
+                onAnimationComplete={() => setDisabled(false)}
               />
               <StyledDots
                 variants={dotContAnim}
@@ -93,6 +115,7 @@ const dotAnim = {
                   variants={dotAnim}
                   custom={0}
                   whileHover={{scale:1.1}}
+                  onClick={()=>HandleAddNote("#FFCF7D")}
                 />
                 <motion.div
                   className="dot"
@@ -100,6 +123,7 @@ const dotAnim = {
                   variants={dotAnim}
                   custom={1}
                   whileHover={{scale:1.1}}
+                  onClick={()=>HandleAddNote("#F0A177")}
                 />
                 <motion.div
                   className="dot"
@@ -107,6 +131,7 @@ const dotAnim = {
                   variants={dotAnim}
                   custom={2}
                   whileHover={{scale:1.1}}
+                  onClick={()=>HandleAddNote("#B095F6")}
                 />
                 <motion.div
                   className="dot"
@@ -114,6 +139,7 @@ const dotAnim = {
                   variants={dotAnim}
                   custom={3}
                   whileHover={{scale:1.1}}
+                  onClick={()=>HandleAddNote("#55CFFA")}
                 />
                 <motion.div
                   className="dot"
@@ -121,6 +147,7 @@ const dotAnim = {
                   variants={dotAnim}
                   custom={4}
                   whileHover={{scale:1.1}}
+                  onClick={()=>HandleAddNote("#E6EE96")}
                 />
               </StyledDots>
             </div>
@@ -133,17 +160,11 @@ const dotAnim = {
                 </div>
             </StyledSearchBar>
             <div className="data">
-                {
-                    notes.map((note, index)=>(
-                        <Note 
-                        note={note} 
-                        notes={notes} 
-                        id={index}
-                        key={index}
-                        />
-                        // <p>{note}</p>
-                    ))
-                }
+                {/* <Reorder.Group axis="x" values={notes} onReorder={setNotes}> */}
+                {notes.map((note, index) => (
+                    <Note key={index} note={note} id={index}/>
+                ))}
+                {/* </Reorder.Group> */}
             </div>
           </StyledRight>
         </div>
@@ -201,7 +222,7 @@ const StyledNote = styled(motion.div)`
 `
 
 const StyledRight = styled(motion.div)`
-    width: 100rem;
+    width: 100%;
     display: flex;
     flex-direction: column;
     .data{
