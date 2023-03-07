@@ -226,11 +226,12 @@ const StyledRight = styled(motion.div)`
     display: flex;
     flex-direction: column;
     .data{
-        width: 100%;
+        margin-top: 2.5rem;
         height: 100%;
         padding: 1rem 3rem;
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 1rem;
         overflow-y: scroll;
 

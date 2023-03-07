@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { animate, motion } from "framer-motion";
+const inviseAnim = {
+  default:{
 
+  },
+  hidden:{
+    opacity :0,
+  },
+  visible:{
+    opacity: 1,
+    transition:{
+      delay: 2
+    }
+  }
+
+}
 function hexToRgba(hex, opacity) {
     const hexWithoutHash = hex.replace('#', '');
     const r = parseInt(hexWithoutHash.substring(0, 2), 16);
@@ -72,6 +86,11 @@ function hexToRgba(hex, opacity) {
         variants={noteVariants}
         initial={id === 0 ? "hidden" : null}
         animate={id === 0 ? "visible" : "default"}
+      > 
+      <motion.div
+        variants={inviseAnim}
+        initial={id === 0 ? "hidden" : null}
+        animate={id === 0 ? "visible" : "default"}
       >
         <textarea
           spellCheck={false}
@@ -80,6 +99,7 @@ function hexToRgba(hex, opacity) {
           value={value}
         ></textarea>
         <p className="date">{id}</p>
+      </motion.div>
       </StyledNote>
     );
   };
@@ -91,12 +111,17 @@ const StyledNote = styled(motion.div)`
     width: 20rem;
     height: 20rem;
     border-radius: 1rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    z-index: 103333;
+    
     background: rgba(29, 29, 29, 0.6);
     border: 2px solid ${(props) => props.color};
+    overflow: hidden;
+    div{
+      width:100%;
+      height: 100%;
+      display: flex;
+      overflow: hidden;
+      flex-direction: column;
+    }
     .date{
         margin-left: 1rem;
         margin-bottom: .3rem;
