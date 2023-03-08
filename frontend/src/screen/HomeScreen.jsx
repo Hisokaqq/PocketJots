@@ -162,7 +162,11 @@ const dotAnim = {
             <div className="data">
                 {/* <Reorder.Group axis="x" values={notes} onReorder={setNotes}> */}
                 {notes.map((note, index) => (
+                  <motion.div
+                  drag
+                  >
                     <Note key={index} note={note} id={index}/>
+                  </motion.div>
                 ))}
                 {/* </Reorder.Group> */}
             </div>
@@ -190,36 +194,7 @@ const dotAnim = {
     }
   `;
 
-const StyledNote = styled(motion.div)`
-    background-color: rgba(255, 207, 125, 1);
-    width: 20rem;
-    height: 20rem;
-    border-radius: 1rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    .date{
-        margin-left: 1rem;
-        margin-bottom: .3rem;
-        color: #0000006a;
-    }
-    textarea {
-        all: unset;
-        flex: 1;
-        color: #000;
-        font-size: 1.5rem;
-        padding: 1rem;
-        font-family: 'Roboto', sans-serif;
-        resize: none;
-        overflow-wrap: break-word;
-        white-space: pre-wrap;
-        
-        &::placeholder{
-            color: #2e2e2e94;
-        }
-    }
 
-`
 
 const StyledRight = styled(motion.div)`
     width: 100%;
@@ -234,7 +209,7 @@ const StyledRight = styled(motion.div)`
         justify-content: center;
         gap: 1rem;
         overflow-y: scroll;
-
+        overflow-x: hidden;
     }
 `
 
