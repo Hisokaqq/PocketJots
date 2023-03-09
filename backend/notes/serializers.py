@@ -2,9 +2,14 @@ from rest_framework import serializers
 from .models import Profile, Note
 
 class ProfileSerializer(serializers.ModelSerializer):
+    notes_count = serializers.SerializerMethodField()
+
+    def get_notes_count(self, obj):
+        return obj.note_set.count()
+
     class Meta:
         model = Profile
-        fields = ['username', 'date_of_creation', 'key', 'id']
+        fields = ['username', 'date_of_creation', 'key', 'id', 'notes_count']
 
 
 

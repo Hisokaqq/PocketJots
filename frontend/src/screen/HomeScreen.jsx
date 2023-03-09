@@ -96,6 +96,9 @@ const dotAnim = {
   
   const HomeScreen = () => {
     const profileData = localStorage.getItem('profile');
+    const profileObject = JSON.parse(profileData);
+    const profileId = profileObject?.id;
+    console.log(profileObject)
     const [isRotated, setIsRotated] = useState(false);
     const [notes, setNotes] = useState([])
     const [isFirstNoteAdded, setIsFirstNoteAdded] = useState(false);
@@ -117,9 +120,7 @@ const dotAnim = {
         setPrev(notes);
         setNotes([]);
         
-        const profileData = localStorage.getItem('profile');
-        const profileObject = JSON.parse(profileData);
-        const profileId = profileObject.id;
+      
         const data = {color:color, user_id: profileId}
         try {
           const response = await axios.post(`http://127.0.0.1:8000/api/notes/create/`, data);
@@ -150,9 +151,7 @@ const dotAnim = {
     const [search, setSearch] = useState("");
 
 useEffect(() => {
-  const profileData = localStorage.getItem('profile');
-  const profileObject = JSON.parse(profileData);
-  const profileId = profileObject.id;
+  
   setFrom(null)
   const fetchProfileNotes = async () => {
     try {
@@ -176,14 +175,17 @@ useEffect(() => {
       exit="exit"
       >
         <div className="container">
+          
           <motion.div
           variants={AnimLeft} 
           className="left">
-            <div>
+            <div className='all'>
             <p className="logo">PocetJots</p>
+           
+
             <div className="notes-container">
               <StyledPlus
-                disabled={disabled}
+                // disabled={disabled}
                 animate={isRotated ? "rotateClockwise" : "rotateCounterClockwise"}
                 variants={plusAnim}
                 onClick={ handlePlusClick}
@@ -259,6 +261,11 @@ useEffect(() => {
 
               </StyledDots>
             </div>
+              
+            
+            </div>
+            <div className="num">
+              <p>{profileObject?.notes_count}</p>
             </div>
             
             
@@ -278,8 +285,11 @@ useEffect(() => {
                 {
                 profileData 
                 ?
-                <div className='icon' onClick={handleLogout}>
-                  <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                <div className='icon icon2' >
+                  <StyledName>
+                    <p className='name'>{profileObject?.username}#{profileObject?.key}</p>
+                  </StyledName>
+                  <FontAwesomeIcon onClick={handleLogout} className='i' icon={faArrowRightFromBracket} />
                 </div>
                 :
                 <Link  to="/login" className='icon'>
@@ -303,6 +313,11 @@ useEffect(() => {
 
   
   
+  const StyledName = styled(motion.div)`
+    color: #fff;
+    .name{
+    }
+  `
 
   const StyledDots = styled(motion.div)`
     height: 300px;
@@ -331,13 +346,13 @@ const StyledRight = styled(motion.div)`
     /* background-color: red; */
     height: 100%;
     .data{
-        margin-top: 2.5rem;
         height: 100%;
         padding: 1rem 9rem;
         height: 100%;
         display: flex;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); 
+        flex-wrap: wrap;
+        /* display: grid; */
+        /* grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));  */
         gap: 2rem;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -351,6 +366,8 @@ const StyledSearchBar = styled(motion.div)`
     margin-left: 8rem;
     display: flex;
     background-color: rgba(29, 29, 29, 0.6);
+    /* background-color: red; */
+
     padding: .2rem 1rem;
     align-items: center;
     position: relative;
@@ -370,6 +387,20 @@ const StyledSearchBar = styled(motion.div)`
           color: #8f8f8f;
         }
     }
+    .icon2{
+      width: 20rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      .i{
+        padding: 1rem;
+        transition: all .4s;
+
+        &:hover{
+          color: #8f8f8f;
+        }
+      }
+    }
 `
 
 
@@ -379,12 +410,12 @@ const StyledHome = styled(motion.div)`
   position: relative;
 
   .notes-container {
-    margin-top: 3rem;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    margin-top: 1.5rem;
   }
 
   .container {
@@ -409,8 +440,14 @@ const StyledHome = styled(motion.div)`
       justify-content: space-between;
       flex-direction: column;
       border-right: #dddddd 2px solid;
-
-
+      .all{
+      }
+      .num{
+        color: #fff;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
       .logo {
         color: white;
         font-weight: 700;
