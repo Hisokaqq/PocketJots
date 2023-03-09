@@ -165,7 +165,7 @@ useEffect(() => {
 }, [navigate, search]);
 const [lastDragged, setLastDragged] = useState(null)
 const deleteHandler = async (id) =>{
-console.log(id)
+setSearch("")
   if(id){
   try {
     const response = await axios.delete(`http://127.0.0.1:8000/api/notes/delete/${id}/`);
@@ -289,12 +289,13 @@ console.log(id)
           
           >
             <StyledSearchBar>
+              <div className='is'>
                 <div className='icon'>
                     <FontAwesomeIcon icon={faMagnifyingGlass}/>
                 </div>
                 
                 <input value={search} onChange={(e => setSearch(e.target.value))} type="text"  placeholder='Search for a note'/>
-                
+                </div>
                 {
                 profileData 
                 ?
@@ -386,16 +387,22 @@ const StyledSearchBar = styled(motion.div)`
     padding: .2rem 1rem;
     align-items: center;
     position: relative;
+    justify-content: space-between;
+    .is{
+      width: 100%;
+      display: flex;
+      padding-right: 1rem;
+      
+    }
     input{
         all: unset;
         color: #fff;
-        width: 89%;
+        flex: 1;
         font-family: 'Roboto', sans-serif;
     }
     .icon{
         color: #fff;
         padding-right: 1rem;
-        width: 2rem;
         transition: all .4s;
 
         &:hover{
@@ -403,10 +410,11 @@ const StyledSearchBar = styled(motion.div)`
         }
     }
     .icon2{
-      width: 20rem;
       display: flex;
       align-items: center;
       gap: 1rem;
+      margin-right: 7rem;
+      
       .i{
         padding: 1rem;
         transition: all .4s;
