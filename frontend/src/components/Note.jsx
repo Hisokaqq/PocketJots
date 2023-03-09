@@ -29,9 +29,7 @@ function hexToRgba(hex, opacity) {
 
 
   
-  const Note = ({ note, id, setIsDragging, isDragging, from, setNotes, notes, setFrom}) => {
-    // console.log(note)
-    // console.log(from)
+  const Note = ({ note, id, setIsDragging, isDragging, from, setNotes, notes, setFrom, setLastDragged}) => {
 
     const noteVariants = {
         default:{
@@ -80,7 +78,14 @@ function hexToRgba(hex, opacity) {
           border: "2px solid red",
           transition:{
             duration:.4
-          }
+          },
+          transitionEnd: {
+            display: "none",
+            position: "absolute",
+          },
+        },
+        exit:{
+          scale: 0
         }
       };
       
@@ -113,15 +118,13 @@ function hexToRgba(hex, opacity) {
     const deleteHandler = async () =>{
       const profileData = localStorage.getItem('profile');
       const profileObject = JSON.parse(profileData);
-      const profileId = profileObject.id;
-      
-      
+      const profileId = profileObject?.id;
       try {
         const response = await axios.delete(`http://127.0.0.1:8000/api/notes/delete/${note.id}/`);
         // setisdelete(true)
         const response2 = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/`);
-        setisdelete(true)
-              // setNotes(response2.data);
+        setNotes(notes => notes.filter(n => n.id !== note.id));
+        setNotes(response2.data);
         
       } catch (error) {
         console.log(error);
@@ -135,26 +138,28 @@ function hexToRgba(hex, opacity) {
     const [isdeleted, setisdelete] = useState(false)
     const profileData = localStorage.getItem('profile');
       const profileObject = JSON.parse(profileData);
-      const profileId = profileObject.id;
+      const profileId = profileObject?.id;
     const updateNoteText = async (e) => {
       setValue(e.target.value)
       try {
         const response = await axios.put(`http://127.0.0.1:8000/api/notes/update/${note.id}/`, { text: e.target.value });
-        // console.log(response.data);
       } catch (error) {
         console.log(error);
       }
     };
     
-
+    
+    
     return (
       <StyledNote
         onDoubleClick={deleteHandler}
         color={hexToRgba(note.color, 1)}
         variants={noteVariants}
-        initial={isdeleted ? "default" : (id === 0  && from) ? "hidden" : "default"}
-        animate={isdeleted ? "delete" : (id === 0  && from) ? "visible" : "default"}
-        
+        // initial={isdeleted ? "default" : (id === 0  && from) ? "hidden" : "default"}
+        // animate={isdeleted ? "delete" : (id === 0  && from) ? "visible" : "default"}
+        initial={ (id === 0  && from) ? "hidden" : "default"}
+        animate={ (id === 0  && from) ? "visible" : "default"}
+        exit="exit"
         drag
         dragConstraints={{
         top: -screenDimensions.height,
@@ -165,17 +170,21 @@ function hexToRgba(hex, opacity) {
         dragSnapToOrigin
         style={{
           zIndex: ownDrag ? 20 : 2,
+
         }}
         onDragStart={() => {
           setIsDragging(true)
           setOwnDrag(true)
+          setLastDragged(note.id)
         }}
         onDragEnd={() => {
-          setIsDragging(false)
-          setOwnDrag(false)
+          setIsDragging(false);
+          setOwnDrag(false);
+          setTimeout(() => {
+            setLastDragged(null);
+          }, 200);
         }
         }
-
       > 
       <motion.div
         variants={inviseAnim}

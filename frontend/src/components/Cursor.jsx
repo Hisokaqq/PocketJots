@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from "styled-components";
 import { motion } from "framer-motion";
 
-const Cursor = () => {
+const Cursor = ({btnRef}) => {
     const cursorsize = 200
     const cursorsize2 = 30
 
@@ -11,6 +11,18 @@ const Cursor = () => {
         y: -20,
     });
 
+    useEffect(() => {
+        const mouseMove = (e) => {
+            setM_p({
+                x: e.clientX,
+                y: e.clientY
+            })   
+        }
+        window.addEventListener("mousemove", mouseMove)
+        return () => {
+            window.removeEventListener("mousemove", mouseMove)
+        }
+    },[])
     const variants = {
         default: {
             x: m_p.x - (cursorsize/2),
@@ -53,18 +65,7 @@ const Cursor = () => {
         }
     };
       
-    useEffect(() => {
-        const mouseMove = (e) => {
-            setM_p({
-                x: e.clientX,
-                y: e.clientY
-            })   
-        }
-        window.addEventListener("mousemove", mouseMove)
-        return () => {
-            window.removeEventListener("mousemove", mouseMove)
-        }
-    },[])
+    
 
     return (
         <>

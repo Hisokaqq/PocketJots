@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import styled from "styled-components";
 import { AnimatePresence, color, motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faUser, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faUser, faArrowRightFromBracket, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Note from '../components/Note';
 import axios from "axios"
 import { Reorder } from 'framer-motion';
@@ -87,18 +87,17 @@ const dotAnim = {
       },
     },
     rotateCounterClockwise: {
-      rotate: -360,
+      rotate: 0,
       transition: {
         duration: .5,
       },
     },
   };
   
-  const HomeScreen = () => {
+  const HomeScreen = ({btnRef}) => {
     const profileData = localStorage.getItem('profile');
     const profileObject = JSON.parse(profileData);
     const profileId = profileObject?.id;
-    console.log(profileObject)
     const [isRotated, setIsRotated] = useState(false);
     const [notes, setNotes] = useState([])
     const [isFirstNoteAdded, setIsFirstNoteAdded] = useState(false);
@@ -107,7 +106,7 @@ const dotAnim = {
     const handlePlusClick = () => {
         
         setIsRotated((prevState) => !prevState);
-        setDisabled(true)
+        // setDisabled(true)
         
     };
     const [color, setColor] = useState(null)
@@ -126,18 +125,17 @@ const dotAnim = {
           const response = await axios.post(`http://127.0.0.1:8000/api/notes/create/`, data);
           // setNotes([]);
           const response2 = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/`);
+
+          const responce3 = await axios.get(`http://127.0.0.1:8000/api/profiles/${profileId}/`)
+          localStorage.setItem('profile', JSON.stringify(responce3.data));
+
           setNotes(response2.data);
         } catch (error) {
           console.log(error);
         }
     }
       
-      // useEffect(() => {
-      //   if (prev.length > 0 && notes.length === 0) {
-      //     setNotes([{color: color}, ...prev]);
-      //   }
-      // }, [notes, prev]);
-      
+
 
     const [isDragging, setIsDragging] = useState(false);
     const navigate = useNavigate()
@@ -145,7 +143,7 @@ const dotAnim = {
     const handleLogout = () => {
       localStorage.removeItem('profile');
       navigate("/login")
-      // window.location.reload();
+
     }
   
     const [search, setSearch] = useState("");
@@ -153,6 +151,7 @@ const dotAnim = {
 useEffect(() => {
   
   setFrom(null)
+
   const fetchProfileNotes = async () => {
     try {
       const response = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/?search=${search}`);
@@ -164,9 +163,22 @@ useEffect(() => {
 
   fetchProfileNotes();
 }, [navigate, search]);
+const [lastDragged, setLastDragged] = useState(null)
+const deleteHandler = async (id) =>{
+console.log(id)
+  if(id){
+  try {
+    const response = await axios.delete(`http://127.0.0.1:8000/api/notes/delete/${id}/`);
+    const response2 = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/`);
+    setNotes(response2.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+}
 
-    
-   
+
+
 
     return (
       <StyledHome
@@ -264,9 +276,10 @@ useEffect(() => {
               
             
             </div>
-            <div className="num">
-              <p>{profileObject?.notes_count}</p>
-            </div>
+            <motion.div onMouseEnter={()=>deleteHandler(lastDragged)} animate = {isDragging ?  {color:"red", opacity: 1, rotate: 0, background:"white"} : {color: "white", opacity: 1, rotate:0 , background:"transparent"}} transition = {{duration:.5}}  whileHover={{scale:1.3, rotate:[20,-20,20,-20,0], color:"red", background:"transparent"}}  className="num">
+              {/* <motion.p>{profileObject?.notes_count}</motion.p> */}
+              <FontAwesomeIcon className='trash' icon={faTrash}/>
+            </motion.div>
             
             
           </motion.div>
@@ -300,9 +313,11 @@ useEffect(() => {
                 
             </StyledSearchBar>
               <div className="data">
+
                   {notes.map((note, index) => (
-                    <Note key={index} note={note} id={index} setIsDragging={setIsDragging} isDragging={isDragging} from={from} setNotes={setNotes} notes={notes} setFrom={setFrom}/>
+                    <Note setLastDragged={setLastDragged}  key={index} note={note} id={index} setIsDragging={setIsDragging} isDragging={isDragging} from={from} setNotes={setNotes} notes={notes} setFrom={setFrom}/>
                   ))}
+
               </div>
           </StyledRight>
         </div>
@@ -444,9 +459,20 @@ const StyledHome = styled(motion.div)`
       }
       .num{
         color: #fff;
-        padding: 1rem;
+        padding: 2rem;
         margin-bottom: 1rem;
         text-align: center;
+        z-index: 300;
+        position: relative;
+        border-radius: 50%;
+        .trash{
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%,-50%);
+          font-size: 1.2rem;
+        }
+        
       }
       .logo {
         color: white;

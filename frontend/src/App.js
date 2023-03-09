@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Cursor from './components/Cursor';
@@ -10,6 +10,8 @@ import { AnimatePresence } from 'framer-motion';
 function App() {
   const navigate = useNavigate();
   const location = useLocation()
+  const btnRef = useRef(null)
+
   useEffect(() => {
     const profileData = localStorage.getItem('profile');
     if (!profileData) {
@@ -29,10 +31,10 @@ function App() {
 
   return (
     <div className="App">
-      <Cursor />
+      <Cursor btnRef={btnRef}/>
       <AnimatePresence mode={'wait'}>
         <Routes location={ location} key={location.pathname}>
-          <Route path="/" element={<HomeScreen />} />
+          <Route path="/" element={<HomeScreen btnRef={btnRef} />} />
           <Route path="/login" element={<LogReg />} />
           <Route path="/e" element={<div />} />
 
