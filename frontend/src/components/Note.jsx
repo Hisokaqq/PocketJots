@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import { animate, motion } from "framer-motion";
+import {  motion, useAnimation } from "framer-motion";
+import axios from 'axios';
+import Moment from 'react-moment';
 const inviseAnim = {
   default:{
 
@@ -27,10 +29,14 @@ function hexToRgba(hex, opacity) {
 
 
   
-  const Note = ({ note, color, id }) => {
+  const Note = ({ note, id, setIsDragging, isDragging, from, setNotes, notes, setFrom}) => {
+    // console.log(note)
+    // console.log(from)
+
     const noteVariants = {
         default:{
-    
+          borderRadius: 16,
+          
         },
         hidden: { 
             // opacity: 0,
@@ -38,10 +44,8 @@ function hexToRgba(hex, opacity) {
             borderRadius: 1000,
             x: 0,
             y: -170,
-            position: "static",
+            // position: "static",
             background: hexToRgba(note.color, 1)
-            
-    
          },
         visible: { 
             x: [100,-100,0],
@@ -70,35 +74,124 @@ function hexToRgba(hex, opacity) {
                 duration: 3
              } 
         },
+        delete:{
+          scale:0,
+          borderRadius: 1000,
+          border: "2px solid red",
+          transition:{
+            duration:.4
+          }
+        }
       };
       
+      const [screenDimensions, setScreenDimensions] = useState({
+        height: typeof window !== "undefined" ? window.innerHeight : 0,
+        width: typeof window !== "undefined" ? window.innerWidth : 0
+      });
+    
+      // Update screen dimensions if window size changes
+      useLayoutEffect(() => {
+        function updateScreenDimensions() {
+          setScreenDimensions({
+            height: window.innerHeight,
+            width: window.innerWidth
+          });
+        }
+    
+        window.addEventListener("resize", updateScreenDimensions);
+    
+        return () => window.removeEventListener("resize", updateScreenDimensions);
+      }, []);
+    
 
-    const [value, setValue] = useState(note.color);
-    
-    
+
+    const [value, setValue] = useState(note.text);
     useEffect(() => {
-      setValue(note.color);
-    }, [note.color]);
-  
+      setValue(note.text);
+    }, [note.text]);
+    const [ownDrag, setOwnDrag] = useState(false)
+    const deleteHandler = async () =>{
+      const profileData = localStorage.getItem('profile');
+      const profileObject = JSON.parse(profileData);
+      const profileId = profileObject.id;
+      
+      
+      try {
+        const response = await axios.delete(`http://127.0.0.1:8000/api/notes/delete/${note.id}/`);
+        // setisdelete(true)
+        const response2 = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/`);
+        setisdelete(true)
+              // setNotes(response2.data);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    
+    // useEffect(() => {
+    //   setValue(note.color);
+    // }, [note.color]);
+
+    const [isdeleted, setisdelete] = useState(false)
+    const profileData = localStorage.getItem('profile');
+      const profileObject = JSON.parse(profileData);
+      const profileId = profileObject.id;
+    const updateNoteText = async (e) => {
+      setValue(e.target.value)
+      try {
+        const response = await axios.put(`http://127.0.0.1:8000/api/notes/update/${note.id}/`, { text: e.target.value });
+        // console.log(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
+
     return (
       <StyledNote
+        onDoubleClick={deleteHandler}
         color={hexToRgba(note.color, 1)}
         variants={noteVariants}
-        initial={id === 0 ? "hidden" : null}
-        animate={id === 0 ? "visible" : "default"}
+        initial={isdeleted ? "default" : (id === 0  && from) ? "hidden" : "default"}
+        animate={isdeleted ? "delete" : (id === 0  && from) ? "visible" : "default"}
+        
+        drag
+        dragConstraints={{
+        top: -screenDimensions.height,
+        right: screenDimensions.width,
+        bottom: screenDimensions.height,
+        left: -screenDimensions.width
+      }}
+        dragSnapToOrigin
+        style={{
+          zIndex: ownDrag ? 20 : 2,
+        }}
+        onDragStart={() => {
+          setIsDragging(true)
+          setOwnDrag(true)
+        }}
+        onDragEnd={() => {
+          setIsDragging(false)
+          setOwnDrag(false)
+        }
+        }
+
       > 
       <motion.div
         variants={inviseAnim}
-        initial={id === 0 ? "hidden" : null}
-        animate={id === 0 ? "visible" : "default"}
+        initial={(id === 0  && from) ? "hidden" : null}
+        animate={(id === 0  && from)? "visible" : "default"}
       >
         <textarea
           spellCheck={false}
           placeholder="Make some notes"
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => updateNoteText(e)}
           value={value}
         ></textarea>
-        <p className="date">{id}</p>
+          <p className="date">
+          <Moment fromNow>{note.date_of_creation}</Moment>
+          
+          </p>
       </motion.div>
       </StyledNote>
     );
@@ -107,7 +200,7 @@ function hexToRgba(hex, opacity) {
 
 const StyledNote = styled(motion.div)`
     
-    
+    z-index: 2;
     width: 20rem;
     height: 20rem;
     border-radius: 1rem;
@@ -115,6 +208,7 @@ const StyledNote = styled(motion.div)`
     background: rgba(29, 29, 29, 0.6);
     border: 2px solid ${(props) => props.color};
     overflow: hidden;
+    z-index: 2;
     div{
       width:100%;
       height: 100%;
@@ -123,9 +217,9 @@ const StyledNote = styled(motion.div)`
       flex-direction: column;
     }
     .date{
-        margin-left: 1rem;
-        margin-bottom: .3rem;
-        color: #0000006a;
+        margin: 1rem;
+        font-size: .8rem;
+        color: #c8c6c6;
         
     }
     textarea {

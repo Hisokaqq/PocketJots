@@ -68,8 +68,7 @@ const Cursor = () => {
 
     return (
         <>
-        <StyledCursor variants={variants} animate={"default"}>
-        </StyledCursor>
+        {/* <StyledCursor variants={variants} animate={"default"}></StyledCursor> */}
         <StyledCursor2 variants={variants} animate={"default2"}/>
         </>
     );

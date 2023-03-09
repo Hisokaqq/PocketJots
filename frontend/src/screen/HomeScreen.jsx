@@ -1,16 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import styled from "styled-components";
 import { AnimatePresence, color, motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faUser, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import Note from '../components/Note';
-function hexToRgba(hex, opacity) {
-    const hexWithoutHash = hex.replace('#', '');
-    const r = parseInt(hexWithoutHash.substring(0, 2), 16);
-    const g = parseInt(hexWithoutHash.substring(2, 4), 16);
-    const b = parseInt(hexWithoutHash.substring(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  }
+import axios from "axios"
+import { Reorder } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+
+const AnimRight = {
+  initial:{
+    x: "100%"
+  },
+  animate:{
+    x: 0,
+    transition:{
+      duration:1
+    }
+  },
+  exit:{
+    x: "100%",
+    transition:{
+      duration:1
+    }
+  },
+}
+
+const AnimLeft = {
+  initial:{
+    x: "-100%"
+  },
+  animate:{
+    x: 0,
+    transition:{
+      duration:.5,
+      delay:.3
+    }
+  },
+  exit:{
+    x: "-100%",
+    transition:{
+      duration:1
+    }
+  },
+}
 
 const dotAnim = {
     open: (i) => ({
@@ -62,46 +95,98 @@ const dotAnim = {
   };
   
   const HomeScreen = () => {
+    const profileData = localStorage.getItem('profile');
     const [isRotated, setIsRotated] = useState(false);
-    const [notes, setNotes] = useState([{color: "FFCF7D"}])
+    const [notes, setNotes] = useState([])
     const [isFirstNoteAdded, setIsFirstNoteAdded] = useState(false);
     const [prev, setPrev] = useState([])
     const [disabled, setDisabled] = useState(false);
     const handlePlusClick = () => {
-        setDisabled(true)
+        
         setIsRotated((prevState) => !prevState);
+        setDisabled(true)
         
     };
     const [color, setColor] = useState(null)
     
-    const HandleAddNote = (color) =>{
+    const HandleAddNote = async (color, pos) =>{
         setColor(color)
+        setFrom(pos)
+        setSearch("")
+        // console.log(pos)
         setPrev(notes);
         setNotes([]);
         
+        const profileData = localStorage.getItem('profile');
+        const profileObject = JSON.parse(profileData);
+        const profileId = profileObject.id;
+        const data = {color:color, user_id: profileId}
+        try {
+          const response = await axios.post(`http://127.0.0.1:8000/api/notes/create/`, data);
+          // setNotes([]);
+          const response2 = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/`);
+          setNotes(response2.data);
+        } catch (error) {
+          console.log(error);
+        }
     }
       
-      useEffect(() => {
-        if (prev.length > 0 && notes.length === 0) {
-          setNotes([{color: color}, ...prev]);
-        }
-      }, [notes, prev]);
+      // useEffect(() => {
+      //   if (prev.length > 0 && notes.length === 0) {
+      //     setNotes([{color: color}, ...prev]);
+      //   }
+      // }, [notes, prev]);
       
-      
-      
-    
+
+    const [isDragging, setIsDragging] = useState(false);
+    const navigate = useNavigate()
+    const [from, setFrom] = useState(null)
+    const handleLogout = () => {
+      localStorage.removeItem('profile');
+      navigate("/login")
+      // window.location.reload();
+    }
   
+    const [search, setSearch] = useState("");
+
+useEffect(() => {
+  const profileData = localStorage.getItem('profile');
+  const profileObject = JSON.parse(profileData);
+  const profileId = profileObject.id;
+  setFrom(null)
+  const fetchProfileNotes = async () => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/notes/profile/${profileId}/?search=${search}`);
+      setNotes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  fetchProfileNotes();
+}, [navigate, search]);
+
+    
+   
+
     return (
-      <StyledHome>
+      <StyledHome
+      animate="animate"
+      initial="initial"
+      exit="exit"
+      >
         <div className="container">
-          <div className="left">
+          <motion.div
+          variants={AnimLeft} 
+          className="left">
+            <div>
             <p className="logo">PocetJots</p>
             <div className="notes-container">
               <StyledPlus
                 disabled={disabled}
                 animate={isRotated ? "rotateClockwise" : "rotateCounterClockwise"}
                 variants={plusAnim}
-                onClick={handlePlusClick}
+                onClick={ handlePlusClick}
                 onAnimationComplete={() => setDisabled(false)}
               />
               <StyledDots
@@ -109,67 +194,106 @@ const dotAnim = {
                 animate={isRotated ? "open" : "close"}
               >
                 <motion.div
-                  className="dot"
-                  style={{ background: "#FFCF7D", position: "absolute", top: 40 }}
-                  variants={dotAnim}
-                  custom={0}
-                  whileHover={{scale:1.1}}
-                  onClick={()=>HandleAddNote("#FFCF7D")}
-                />
-                <motion.div
-                  className="dot"
-                  style={{ background: "#F0A177", position: "absolute", top: 80 }}
-                  variants={dotAnim}
-                  custom={1}
-                  whileHover={{scale:1.1}}
-                  onClick={()=>HandleAddNote("#F0A177")}
-                />
-                <motion.div
-                  className="dot"
-                  style={{ background: "#B095F6", position: "absolute", top: 120 }}
-                  variants={dotAnim}
-                  custom={2}
-                  whileHover={{scale:1.1}}
-                  onClick={()=>HandleAddNote("#B095F6")}
-                />
-                <motion.div
-                  className="dot"
-                  style={{ background: "#55CFFA", position: "absolute", top: 160 }}
-                  variants={dotAnim}
-                  custom={3}
-                  whileHover={{scale:1.1}}
-                  onClick={()=>HandleAddNote("#55CFFA")}
-                />
-                <motion.div
-                  className="dot"
-                  style={{ background: "#E6EE96", position: "absolute", top: 200 }}
-                  variants={dotAnim}
-                  custom={4}
-                  whileHover={{scale:1.1}}
-                  onClick={()=>HandleAddNote("#E6EE96")}
-                />
+                className="dot"
+                style={{ background: "#FFCF7D", position: "absolute", top: 40 }}
+                variants={dotAnim}
+                custom={0}
+                whileHover={{scale:1.1}}
+                onClick={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const pos = { 
+                    x: rect.left + rect.width / 2, 
+                    y: rect.top + rect.height / 2 
+                  };
+                  HandleAddNote("#FFCF7D", pos);
+                }}
+              />
+              <motion.div
+                className="dot"
+                style={{ background: "#F0A177", position: "absolute", top: 80 }}
+                variants={dotAnim}
+                custom={1}
+                whileHover={{ scale: 1.1 }}
+                onClick={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                  HandleAddNote("#F0A177", pos);
+                }}
+              />
+              <motion.div
+                className="dot"
+                style={{ background: "#B095F6", position: "absolute", top: 120 }}
+                variants={dotAnim}
+                custom={2}
+                whileHover={{ scale: 1.1 }}
+                onClick={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                  HandleAddNote("#B095F6", pos);
+                }}
+              />
+              <motion.div
+                className="dot"
+                style={{ background: "#55CFFA", position: "absolute", top: 160 }}
+                variants={dotAnim}
+                custom={3}
+                whileHover={{ scale: 1.1 }}
+                onClick={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                  HandleAddNote("#55CFFA", pos);
+                }}
+              />
+              <motion.div
+                className="dot"
+                style={{ background: "#E6EE96", position: "absolute", top: 200 }}
+                variants={dotAnim}
+                custom={4}
+                whileHover={{ scale: 1.1 }}
+                onClick={(e) => {
+                  const rect = e.target.getBoundingClientRect();
+                  const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                  HandleAddNote("#E6EE96", pos);
+                }}
+              />
+
               </StyledDots>
             </div>
-          </div>
-          <StyledRight>
+            </div>
+            
+            
+          </motion.div>
+          <StyledRight
+          variants={AnimRight}
+          
+          
+          >
             <StyledSearchBar>
                 <div className='icon'>
                     <FontAwesomeIcon icon={faMagnifyingGlass}/>
                 </div>
-                <input type="text"  placeholder='Search for a note'/>
+                
+                <input value={search} onChange={(e => setSearch(e.target.value))} type="text"  placeholder='Search for a note'/>
+                
+                {
+                profileData 
+                ?
+                <div className='icon' onClick={handleLogout}>
+                  <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                </div>
+                :
+                <Link  to="/login" className='icon'>
+                 <FontAwesomeIcon icon={faUser}/>
+               </Link>
+                }
+                
                 
             </StyledSearchBar>
-            <div className="data">
-                {/* <Reorder.Group axis="x" values={notes} onReorder={setNotes}> */}
-                {notes.map((note, index) => (
-                  <motion.div
-                  drag
-                  >
-                    <Note key={index} note={note} id={index}/>
-                  </motion.div>
-                ))}
-                {/* </Reorder.Group> */}
-            </div>
+              <div className="data">
+                  {notes.map((note, index) => (
+                    <Note key={index} note={note} id={index} setIsDragging={setIsDragging} isDragging={isDragging} from={from} setNotes={setNotes} notes={notes} setFrom={setFrom}/>
+                  ))}
+              </div>
           </StyledRight>
         </div>
       </StyledHome>
@@ -177,11 +301,13 @@ const dotAnim = {
   };
   
 
+  
+  
+
   const StyledDots = styled(motion.div)`
     height: 300px;
     width: 30px;
     margin: auto;
-    /* background-color: red; */
     overflow: hidden;
     position: relative;
 
@@ -191,6 +317,7 @@ const dotAnim = {
       aspect-ratio: 1;
       border-radius: 50%;
       box-shadow: 0px 3px 5px rgba(0, 0, 0, .5);
+      z-index: 3;
     }
   `;
 
@@ -200,35 +327,48 @@ const StyledRight = styled(motion.div)`
     width: 100%;
     display: flex;
     flex-direction: column;
+    position: absolute;
+    /* background-color: red; */
+    height: 100%;
     .data{
         margin-top: 2.5rem;
         height: 100%;
-        padding: 1rem 3rem;
+        padding: 1rem 9rem;
+        height: 100%;
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); 
+        gap: 2rem;
         overflow-y: scroll;
         overflow-x: hidden;
+        /* margin-left: 7rem; */
     }
 `
 
 const StyledSearchBar = styled(motion.div)`
     width: 100%;
     height: 4rem;
+    margin-left: 8rem;
     display: flex;
     background-color: rgba(29, 29, 29, 0.6);
     padding: .2rem 1rem;
     align-items: center;
+    position: relative;
     input{
         all: unset;
         color: #fff;
-        flex: 1;
+        width: 89%;
         font-family: 'Roboto', sans-serif;
     }
     .icon{
         color: #fff;
         padding-right: 1rem;
+        width: 2rem;
+        transition: all .4s;
+
+        &:hover{
+          color: #8f8f8f;
+        }
     }
 `
 
@@ -260,14 +400,16 @@ const StyledHome = styled(motion.div)`
     display: flex;
 
     .left {
-        
+      z-index: 3;
       width: 7rem;
       height: 100%;
       background-color: rgba(29, 29, 29, 0.4);
       display: flex;
       align-items: center;
+      justify-content: space-between;
       flex-direction: column;
       border-right: #dddddd 2px solid;
+
 
       .logo {
         color: white;
