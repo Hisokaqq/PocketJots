@@ -62,6 +62,9 @@ const Cursor = ({btnRef}) => {
             y: m_p.y - (cursorsize2/2),
             height: cursorsize2,
             width: cursorsize2,
+            transition: {
+                duration:0
+            }
         }
     };
       

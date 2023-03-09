@@ -212,7 +212,7 @@ setSearch("")
                 style={{ background: "#FFCF7D", position: "absolute", top: 40 }}
                 variants={dotAnim}
                 custom={0}
-                whileHover={{scale:1.1}}
+                whileHover={{scale:1.3}}
                 onClick={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const pos = { 
@@ -227,7 +227,7 @@ setSearch("")
                 style={{ background: "#F0A177", position: "absolute", top: 80 }}
                 variants={dotAnim}
                 custom={1}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.3 }}
                 onClick={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -239,7 +239,7 @@ setSearch("")
                 style={{ background: "#B095F6", position: "absolute", top: 120 }}
                 variants={dotAnim}
                 custom={2}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.3 }}
                 onClick={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -251,7 +251,7 @@ setSearch("")
                 style={{ background: "#55CFFA", position: "absolute", top: 160 }}
                 variants={dotAnim}
                 custom={3}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.3 }}
                 onClick={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -263,7 +263,7 @@ setSearch("")
                 style={{ background: "#E6EE96", position: "absolute", top: 200 }}
                 variants={dotAnim}
                 custom={4}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.3 }}
                 onClick={(e) => {
                   const rect = e.target.getBoundingClientRect();
                   const pos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
