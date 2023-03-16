@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from "styled-components";
 import { motion } from "framer-motion";
 
-const Cursor = ({btnRef}) => {
+const Cursor = () => {
     const cursorsize = 200
     const cursorsize2 = 30
 

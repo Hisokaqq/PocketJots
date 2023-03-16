@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import styled from "styled-components";
-import {  motion, useAnimation } from "framer-motion";
+import {  motion } from "framer-motion";
 import axios from 'axios';
 import Moment from 'react-moment';
 const inviseAnim = {
@@ -29,7 +29,7 @@ function hexToRgba(hex, opacity) {
 
 
   
-  const Note = ({ note, id, setIsDragging, isDragging, from, setNotes, notes, setFrom, setLastDragged}) => {
+  const Note = ({ note, id, setIsDragging, from, setNotes, setLastDragged}) => {
 
     const noteVariants = {
         default:{
@@ -135,10 +135,8 @@ function hexToRgba(hex, opacity) {
     //   setValue(note.color);
     // }, [note.color]);
 
-    const [isdeleted, setisdelete] = useState(false)
     const profileData = localStorage.getItem('profile');
       const profileObject = JSON.parse(profileData);
-      const profileId = profileObject?.id;
     const updateNoteText = async (e) => {
       setValue(e.target.value)
       try {

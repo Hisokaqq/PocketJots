@@ -3,11 +3,9 @@ import { motion } from 'framer-motion'
 import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router';
 import styled from 'styled-components'
-
 const LogReg = () => {
   const [username, setUsername] = useState("");
   const [key, setKey] = useState("");
-  const [profile, setProfile] = useState();
   const navitate = useNavigate() 
   const [error, setError] = useState(null)
   useEffect(()=>{
@@ -24,7 +22,6 @@ const LogReg = () => {
 
   const LRhandler = async (e) => {
     e.preventDefault();
-    const profileData = localStorage.getItem('profile');
     const data = key ? { username: username, key: key } : { username: username };
   
     try {
@@ -58,7 +55,7 @@ const LogReg = () => {
 
   return (
     <StyledLogReg>
-      <motion.p initial={{y:-300}} animate={{y:0}} transition={{duration:.3}} className='info'>Existing users can login with their username and pocket key, while new users can register with just their username</motion.p>
+      <motion.p initial={{y:-300}} animate={{y:0}} transition={{duration:.3}} className='info'>Existing users can login with their username and <span className='key'>PocketJot key</span> , while new users can register with just their username</motion.p>
       <motion.form onSubmit={LRhandler}>
         <div className="incont">
           <input
@@ -95,6 +92,9 @@ const LogReg = () => {
   );
 };
 
+
+
+
 const StyledBtn = styled(motion.div)`
   
   all: unset;
@@ -123,7 +123,10 @@ const StyledBtn = styled(motion.div)`
 
 
 const StyledLogReg = styled(motion.div)`
-
+.key{
+  color: #fc9797;
+  position: relative;
+}
   width: 100%;
   height: 100vh;
   display: flex;

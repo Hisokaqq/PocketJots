@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useState} from 'react';
 import styled from "styled-components";
-import { AnimatePresence, color, motion} from "framer-motion";
+import {  motion} from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faUser, faArrowRightFromBracket, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Note from '../components/Note';
 import axios from "axios"
-import { Reorder } from 'framer-motion';
+
 import { Link, useNavigate } from 'react-router-dom';
 
 const AnimRight = {
@@ -176,7 +176,6 @@ setSearch("")
   }
 }
 }
-
 
 
 
@@ -364,6 +363,7 @@ const StyledRight = styled(motion.div)`
     .data{
         height: 100%;
         padding: 1rem 9rem;
+        
         height: 100%;
         display: flex;
         flex-wrap: wrap;
@@ -373,6 +373,11 @@ const StyledRight = styled(motion.div)`
         overflow-y: scroll;
         overflow-x: hidden;
         /* margin-left: 7rem; */
+        @media only screen and (max-width: 620px) {
+        padding: 1rem 0 1rem 7rem;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
     }
 `
 
@@ -385,13 +390,22 @@ const StyledSearchBar = styled(motion.div)`
     /* background-color: red; */
 
     padding: .2rem 1rem;
-    align-items: center;
     position: relative;
     justify-content: space-between;
+    @media only screen and (max-width: 620px) {
+        margin-left: 6rem;
+        padding: 1rem;
+        flex-direction: column;
+      }
     .is{
       width: 100%;
       display: flex;
       padding-right: 1rem;
+      align-items: center;
+      @media only screen and (max-width: 620px) {
+        padding-right: .5rem;
+        align-items: baseline;
+      }
       
     }
     input{
@@ -414,9 +428,17 @@ const StyledSearchBar = styled(motion.div)`
       align-items: center;
       gap: 1rem;
       margin-right: 7rem;
+      @media only screen and (max-width: 620px) {
+        justify-content: space-between;
+        margin-right: 0;
+        width: 82%;
+      }
       
       .i{
         padding: 1rem;
+        @media only screen and (max-width: 620px) {
+        padding: .8rem
+      }
         transition: all .4s;
 
         &:hover{
@@ -463,6 +485,9 @@ const StyledHome = styled(motion.div)`
       justify-content: space-between;
       flex-direction: column;
       border-right: #dddddd 2px solid;
+      @media only screen and (max-width: 620px) {
+        width: 5rem;
+      }
       .all{
       }
       .num{
@@ -487,6 +512,10 @@ const StyledHome = styled(motion.div)`
         font-weight: 700;
         padding: 1rem 0.7rem;
         margin-top: .4rem;
+        @media only screen and (max-width: 620px) {
+          font-size: .8rem;
+      }
+       
       }
     }
   }
@@ -500,6 +529,10 @@ const StyledPlus = styled(motion.button)`
   height: 60px;
   background-color: rgba(255, 255, 255, 1);
   transition: all .3s ease-out;
+  @media only screen and (max-width: 620px) {
+          width: 50px;
+          height: 50px;
+      }
   &:hover{
     background-color: #aaaaaa;
   }
