@@ -26,6 +26,7 @@ Clone the repository and set up the frontend and backend separately.
 ```bash
 git clone https://github.com/Hisokaqq/PocketJots
 cd PocketJots/backend
+pip install django djangorestframework django-cors-headers djangorestframework-simplejwt pillow
 python manage.py migrate
 python manage.py runserver
 
